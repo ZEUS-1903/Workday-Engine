@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BP Engine</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="5" cy="12" r="3"/><circle cx="19" cy="6" r="3"/><circle cx="19" cy="18" r="3"/><path d="M8 12h4m0 0 4-5m-4 5 4 5" fill="none" stroke-width="2"/></svg>
+      </span>
+      <div>
+        <div class="brand-name">BP Engine</div>
+        <div class="brand-sub">Workday-style business process simulator</div>
+      </div>
+    </div>
+    <div class="acting-as">
+      <label for="user-select">Acting as</label>
+      <select id="user-select"></select>
+      <div id="user-roles" class="role-chips"></div>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Main">
+    <a href="#/inbox" data-route="inbox">My Tasks <span id="inbox-count" class="count" hidden></span></a>
+    <a href="#/start" data-route="start">Start a Process</a>
+    <a href="#/events" data-route="events">Business Processes</a>
+    <a href="#/definitions" data-route="definitions">Definitions</a>
+    <a href="#/people" data-route="people">People &amp; Orgs</a>
+    <a href="#/payroll" data-route="payroll">Payroll Feed</a>
+  </nav>
+
+  <main id="view" tabindex="-1"></main>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+
+  <footer class="footer">
+    Learning project. Not affiliated with or endorsed by Workday, Inc.
+    API docs at <a href="/docs">/docs</a>.
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

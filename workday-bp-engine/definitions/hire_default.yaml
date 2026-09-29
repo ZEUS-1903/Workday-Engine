@@ -1,0 +1,58 @@
+id: hire_default
+bp_type: hire
+definition_name: Hire (Default Definition)
+org_id: null
+description: >
+  Used for every organization that has no organization-specific Hire
+  definition of its own (or on a superior organization).
+
+validations:
+  - name: Positive salary
+    error_when: data.salary <= 0
+    severity: critical
+    message: Salary must be greater than zero.
+  - name: Salary within pay range
+    error_when: data.salary < job_profile.pay_range_min or data.salary > job_profile.pay_range_max
+    severity: warning
+    message: Proposed salary is outside the pay range for the selected job profile.
+
+steps:
+  - order: a
+    type: initiation
+    name: Hire
+
+  # Two steps with order "b" run in parallel.
+  - order: b
+    type: approval
+    name: HR Partner Approval
+    groups: [HR Partner]
+    routing_restrictions: [exclude_initiator]
+    alternate_groups: [HR Administrator]
+    due_in_days: 2
+
+  - order: b
+    type: subprocess
+    name: Propose Compensation
+    subprocess: propose_compensation
+
+  - order: c
+    type: approval_chain
+    name: Management Chain Approval (high salary)
+    entry_condition: data.salary >= 150000
+    # Evaluated for each manager up the chain; managers above VP level
+    # (management level 1-2) are skipped.
+    while_running_condition: approver.management_level >= 3
+    routing_restrictions: [exclude_initiator]
+    due_in_days: 3
+
+  - order: d
+    type: to_do
+    name: Prepare Onboarding
+    groups: [Manager]
+    instructions: Order equipment, request system accounts and assign an onboarding buddy.
+    due_in_days: 5
+
+  - order: e
+    type: integration
+    name: Send to Payroll
+    integration: Payroll Effective Change (simulated)

@@ -1,0 +1,65 @@
+id: change_job_default
+bp_type: change_job
+definition_name: Change Job (Default Definition)
+org_id: null
+description: >
+  Promotions, transfers and pay changes. Compensation Partner approval is only
+  needed for raises above 10%; promotions into a more senior management level
+  or raises above 15% also go up the management chain.
+
+validations:
+  - name: Positive salary
+    error_when: data.salary <= 0
+    severity: critical
+    message: Salary must be greater than zero.
+  - name: Effective date after hire date
+    error_when: data.effective_date < worker.hire_date
+    severity: critical
+    message: The effective date cannot be before the worker's hire date.
+  - name: Something must change
+    error_when: >
+      data.salary == worker.salary and data.job_profile_id == worker.job_profile_id
+      and data.org_id == worker.org_id
+    severity: critical
+    message: No changes were proposed.
+  - name: Salary within pay range
+    error_when: data.salary < job_profile.pay_range_min or data.salary > job_profile.pay_range_max
+    severity: warning
+    message: Proposed salary is outside the pay range for the selected job profile.
+
+steps:
+  - order: a
+    type: initiation
+    name: Change Job
+
+  - order: b
+    type: approval
+    name: HR Partner Approval
+    groups: [HR Partner]
+    routing_restrictions: [exclude_initiator, exclude_event_subject]
+    alternate_groups: [HR Administrator]
+    due_in_days: 3
+
+  - order: b
+    type: approval
+    name: Compensation Partner Approval
+    groups: [Compensation Partner]
+    entry_condition: pay_change_pct > 10
+    routing_restrictions: [exclude_initiator, exclude_event_subject]
+    alternate_groups: [HR Administrator]
+    due_in_days: 3
+
+  - order: c
+    type: approval_chain
+    name: Management Chain Approval
+    entry_condition: >
+      job_profile.management_level < current_job_profile.management_level
+      or pay_change_pct > 15
+    while_running_condition: approver.management_level >= 3
+    routing_restrictions: [exclude_initiator, exclude_event_subject]
+    due_in_days: 3
+
+  - order: d
+    type: integration
+    name: Send to Payroll
+    integration: Payroll Effective Change (simulated)

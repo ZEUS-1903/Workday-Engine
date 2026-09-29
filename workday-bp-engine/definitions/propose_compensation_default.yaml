@@ -1,0 +1,22 @@
+id: propose_compensation_default
+bp_type: propose_compensation
+definition_name: Propose Compensation (Default Definition)
+org_id: null
+description: >
+  Sub-process of Hire. The Compensation Partner only needs to approve when the
+  offer is above the midpoint of the job profile's pay range; otherwise the
+  approval step is Not Required and the sub-process completes immediately.
+
+steps:
+  - order: a
+    type: initiation
+    name: Propose Compensation
+
+  - order: b
+    type: approval
+    name: Compensation Partner Approval
+    groups: [Compensation Partner]
+    entry_condition: data.salary > job_profile.pay_range_mid
+    routing_restrictions: [exclude_initiator]
+    alternate_groups: [HR Administrator]
+    due_in_days: 2

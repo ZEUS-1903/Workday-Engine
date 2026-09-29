@@ -1,0 +1,29 @@
+# One security policy per business process TYPE (not per definition),
+# which is how Workday structures it: every definition of "Hire" shares the
+# same policy. Group names:
+#   Role-based:  Manager, HR Partner, Compensation Partner
+#                (assigned on supervisory organizations, inherited downward)
+#   User-based:  HR Administrator, Business Process Administrator
+#   Pseudo:      Initiator (the person who started the event)
+
+hire:
+  initiate: [Manager, HR Partner]
+  cancel: [Initiator, HR Administrator, Business Process Administrator]
+  rescind: [Business Process Administrator]
+
+change_job:
+  initiate: [Manager, HR Partner]
+  cancel: [Initiator, HR Administrator, Business Process Administrator]
+  rescind: [Business Process Administrator]
+
+termination:
+  initiate: [Manager, HR Partner]
+  cancel: [Initiator, HR Administrator, Business Process Administrator]
+  rescind: [Business Process Administrator]
+
+# Only ever started as a sub-process of Hire, so nobody can initiate,
+# cancel or rescind it directly.
+propose_compensation:
+  initiate: []
+  cancel: []
+  rescind: []

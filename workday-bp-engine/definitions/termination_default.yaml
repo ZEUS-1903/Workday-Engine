@@ -1,0 +1,39 @@
+id: termination_default
+bp_type: termination
+definition_name: Termination (Default Definition)
+org_id: null
+description: >
+  Ends a worker's employment. After HR Partner approval, the manager's
+  offboarding To Do and the payroll integration run in parallel (both have
+  order "c").
+
+validations:
+  - name: Termination date after hire date
+    error_when: data.effective_date < worker.hire_date
+    severity: critical
+    message: The termination date cannot be before the worker's hire date.
+
+steps:
+  - order: a
+    type: initiation
+    name: Termination
+
+  - order: b
+    type: approval
+    name: HR Partner Approval
+    groups: [HR Partner]
+    routing_restrictions: [exclude_initiator, exclude_event_subject]
+    alternate_groups: [HR Administrator]
+    due_in_days: 2
+
+  - order: c
+    type: to_do
+    name: Offboarding Checklist
+    groups: [Manager]
+    instructions: Collect equipment and confirm that system access has been removed.
+    due_in_days: 3
+
+  - order: c
+    type: integration
+    name: Send to Payroll
+    integration: Payroll Effective Change (simulated)

@@ -1,0 +1,4 @@
+-r requirements.txt
+pytest==9.1.1
+# Starlette 1.7's TestClient prefers httpx2 (successor to httpx) and warns if only httpx is installed
+httpx2==2.13.1

@@ -1,0 +1,56 @@
+id: hire_engineering
+bp_type: hire
+definition_name: Hire (Engineering)
+org_id: ORG-200
+description: >
+  Organization-specific definition for Engineering. Sub-organizations such as
+  Platform Team and Data Team pick this up through the superior-organization
+  lookup. Difference from the default: every Engineering hire goes up the
+  management chain to VP level, regardless of salary.
+
+validations:
+  - name: Positive salary
+    error_when: data.salary <= 0
+    severity: critical
+    message: Salary must be greater than zero.
+  - name: Salary within pay range
+    error_when: data.salary < job_profile.pay_range_min or data.salary > job_profile.pay_range_max
+    severity: warning
+    message: Proposed salary is outside the pay range for the selected job profile.
+
+steps:
+  - order: a
+    type: initiation
+    name: Hire
+
+  - order: b
+    type: approval
+    name: HR Partner Approval
+    groups: [HR Partner]
+    routing_restrictions: [exclude_initiator]
+    alternate_groups: [HR Administrator]
+    due_in_days: 2
+
+  - order: b
+    type: subprocess
+    name: Propose Compensation
+    subprocess: propose_compensation
+
+  - order: c
+    type: approval_chain
+    name: Engineering Management Chain Approval
+    while_running_condition: approver.management_level >= 3
+    routing_restrictions: [exclude_initiator, exclude_prior_approvers]
+    due_in_days: 3
+
+  - order: d
+    type: to_do
+    name: Prepare Onboarding
+    groups: [Manager]
+    instructions: Order a laptop, request repository access and assign an onboarding buddy.
+    due_in_days: 5
+
+  - order: e
+    type: integration
+    name: Send to Payroll
+    integration: Payroll Effective Change (simulated)
